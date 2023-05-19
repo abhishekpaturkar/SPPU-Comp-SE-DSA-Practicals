@@ -1,0 +1,206 @@
+#include <iostream>
+
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value) {
+        data = value;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+
+class Tree {
+private:
+    Node* root;
+
+public:
+    Tree() {
+        root = nullptr;
+    }
+
+    Node* insertNode(Node* root, int value) {
+        if (root == nullptr) {
+            Node* newNode = new Node(value);
+            return newNode;
+        }
+
+        if (value < root->data) {
+            root->left = insertNode(root->left, value);
+        } else {
+            root->right = insertNode(root->right, value);
+        }
+
+        return root;
+    }
+
+    int findLongestPath(Node* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+
+        int leftPath = findLongestPath(root->left);
+        int rightPath = findLongestPath(root->right);
+
+        return max(leftPath, rightPath) + 1;
+    }
+
+    int findMinimumValue(Node* root) {
+        if (root == nullptr) {
+            cout << "Tree is empty." << endl;
+            return -1;
+        }
+
+        while (root->left != nullptr) {
+            root = root->left;
+        }
+
+        return root->data;
+    }
+
+    Node* swapPointers(Node* root) {
+        if (root == nullptr) {
+            return nullptr;
+        }
+
+        Node* temp = root->left;
+        root->left = root->right;
+        root->right = temp;
+
+        swapPointers(root->left);
+        swapPointers(root->right);
+
+        return root;
+    }
+
+    bool searchValue(Node* root, int value) {
+        if (root == nullptr) {
+            return false;
+        }
+
+        if (root->data == value) {
+            return true;
+        } else if (value < root->data) {
+            return searchValue(root->left, value);
+        } else {
+            return searchValue(root->right, value);
+        }
+    }
+
+    void insertNode(int value) {
+        root = insertNode(root, value);
+        cout << "Node inserted successfully." << endl;
+    }
+
+    void findLongestPath() {
+        int longestPath = findLongestPath(root);
+        cout << "Number of nodes in the longest path from root: " << longestPath << endl;
+    }
+
+    void findMinimumValue() {
+        int minimumValue = findMinimumValue(root);
+        if (minimumValue != -1) {
+            cout << "Minimum data value found in the tree: " << minimumValue << endl;
+        }
+    }
+
+    void swapPointers() {
+        root = swapPointers(root);
+        cout << "Left and right pointers swapped at every node." << endl;
+    }
+
+    bool isEmpty() {
+        return root == nullptr;
+    }
+
+    void printTree(Node* root, int indent = 0) {
+        if (root == nullptr) {
+            return;
+        }
+
+        printTree(root->right, indent + 4);
+
+        for (int i = 0; i < indent; i++) {
+            cout << " ";
+        }
+        cout << root->data << endl;
+
+        printTree(root->left, indent + 4);
+    }
+
+    void printTree() {
+        if (isEmpty()) {
+            cout << "Tree is empty." << endl;
+        } else {
+            cout << "Binary Tree:" << endl;
+            printTree(root);
+        }
+    }
+
+    void searchValue(int value) {
+        bool found = searchValue(root, value);
+        if (found) {
+            cout << "Value " << value << " found in the tree." << endl;
+        } else {
+            cout << "Value " << value << " not found in the tree." << endl;
+        }
+    }
+};
+
+int main() {
+    Tree binaryTree;
+    int choice;
+
+    while (true) {
+        cout << "Menu:" << endl;
+        cout << "1. Insert Node" << endl;
+        cout << "2. Find Number of Nodes in Longest Path from Root" << endl;
+        cout << "3. Find Minimum Data Value" << endl;
+        cout << "4. Swap Left and Right Pointers at Every Node" << endl;
+        cout << "5. Search a Value" << endl;
+        cout << "6. Print Tree" << endl;
+        cout << "7. Exit" << endl;
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                int value;
+                cout << "Enter the value to insert: ";
+                cin >> value;
+                binaryTree.insertNode(value);
+                break;
+            }
+            case 2:
+                binaryTree.findLongestPath();
+                break;
+            case 3:
+                binaryTree.findMinimumValue();
+                break;
+            case 4:
+                binaryTree.swapPointers();
+                break;
+            case 5: {
+                int value;
+                cout << "Enter the value to search: ";
+                cin >> value;
+                binaryTree.searchValue(value);
+                break;
+            }
+            case 6:
+                binaryTree.printTree();
+                break;
+            case 7:
+                cout << "Exiting the program." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+        cout << endl;
+    }
+}

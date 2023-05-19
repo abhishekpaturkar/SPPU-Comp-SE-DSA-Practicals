@@ -1,0 +1,100 @@
+class HashTable:
+    def __init__(self, size, collision_handling):
+        self.size = size
+        self.table = [None] * size
+        self.collision_handling = collision_handling
+
+    def _hash_function(self, key):
+        return key % self.size
+
+    def _get_next_index(self, index, i):
+        if self.collision_handling == "separate chaining":
+            return (index + i) % self.size
+        elif self.collision_handling == "linear probing":
+            return (index + i) % self.size
+
+    def insert(self, key, value):
+        index = self._hash_function(key)
+        if self.table[index] is None:
+            self.table[index] = (key, value)
+        else:
+            i = 1
+            next_index = self._get_next_index(index, i)
+            while self.table[next_index] is not None:
+                i += 1
+                next_index = self._get_next_index(index, i)
+            self.table[next_index] = (key, value)
+
+    def search_by_name(self, name):
+        comparisons = 0
+        for item in self.table:
+            comparisons += 1
+            if item is not None and item[1] == name:
+                return item[0], comparisons
+        return None, comparisons
+
+    def show_list(self):
+        for item in self.table:
+            if item is not None:
+                print(f"Name: {item[1]}, Telephone number: {item[0]}")
+
+
+def print_menu():
+    print("Menu:")
+    print("1. Insert Client")
+    print("2. Search by Name")
+    print("3. Show List")
+    print("4. Exit")
+
+
+def insert_client():
+    key = int(input("Enter the telephone number: "))
+    value = input("Enter the name: ")
+    telephone_book.insert(key, value)
+    print("Client inserted.")
+
+
+def search_by_name():
+    name = input("Enter the name to search: ")
+    number, comparisons = telephone_book.search_by_name(name)
+    if number is not None:
+        print(f"Telephone number: {number}")
+        print(f"Comparisons required: {comparisons}")
+    else:
+        print("Client not found.")
+        print(f"Comparisons required: {comparisons}")
+
+
+def show_list():
+    telephone_book.show_list()
+
+
+print("Choose a collision handling technique:")
+print("1. Separate Chaining")
+print("2. Linear Probing")
+collision_handling = input("Enter your choice: ")
+if collision_handling == "1":
+    collision_handling = "separate chaining"
+elif collision_handling == "2":
+    collision_handling = "linear probing"
+else:
+    print("Invalid choice. Exiting...")
+    exit()
+
+size = int(input("Enter the size of the hash table: "))
+telephone_book = HashTable(size, collision_handling)
+
+while True:
+    print_menu()
+    choice = input("Enter your choice: ")
+
+    if choice == "1":
+        insert_client()
+    elif choice == "2":
+        search_by_name()
+    elif choice == "3":
+        show_list()
+    elif choice == "4":
+        break
+    else:
+        print("Invalid choice. Please try again.")
