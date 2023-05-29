@@ -1,177 +1,118 @@
 #include <iostream>
-#include <cstring>
-
 using namespace std;
 
-struct Node {
+struct node
+{
     char name[100];
-    Node* children;
-    Node* nextSibling;
+    int count;
+    node *child[10];
+} *root;
 
-    Node(const char* name) {
-        strcpy(this->name, name);
-        children = nullptr;
-        nextSibling = nullptr;
-    }
-};
-
-class Tree {
-private:
-    Node* root;
-
+class Tree
+{
 public:
-    Tree() {
-        root = nullptr;
+    Tree()
+    {
+        root = NULL;
     }
-
-    void addNode(Node* parent, Node* child) {
-        if (parent->children == nullptr) {
-            parent->children = child;
-        } else {
-            Node* sibling = parent->children;
-            while (sibling->nextSibling != nullptr) {
-                sibling = sibling->nextSibling;
-            }
-            sibling->nextSibling = child;
-        }
-    }
-
-    void printNodes(Node* node, int depth) {
-        for (int i = 0; i < depth; i++) {
-            cout << "-";
-        }
-        cout << node->name << endl;
-
-        Node* child = node->children;
-        while (child != nullptr) {
-            printNodes(child, depth + 1);
-            child = child->nextSibling;
-        }
-    }
-
-    void addChapter() {
-        char chapterName[100];
-        cout << "Enter chapter name: ";
-        cin.ignore();
-        cin.getline(chapterName, sizeof(chapterName));
-
-        Node* chapter = new Node(chapterName);
-        if (root == nullptr) {
-            root = chapter;
-        } else {
-            addNode(root, chapter);
-        }
-    }
-
-    void addSection() {
-        if (root == nullptr) {
-            cout << "No chapters found. Please add a chapter first." << endl;
-            return;
-        }
-
-        char chapterName[100];
-        cout << "Enter chapter name: ";
-        cin.ignore();
-        cin.getline(chapterName, sizeof(chapterName));
-
-        Node* chapter = root;
-        while (chapter != nullptr && strcmp(chapter->name, chapterName) != 0) {
-            chapter = chapter->nextSibling;
-        }
-
-        if (chapter == nullptr) {
-            cout << "Chapter not found." << endl;
-            return;
-        }
-
-        char sectionName[100];
-        cout << "Enter section name: ";
-        cin.getline(sectionName, sizeof(sectionName));
-
-        Node* section = new Node(sectionName);
-        addNode(chapter, section);
-    }
-
-    void addSubsection() {
-        if (root == nullptr) {
-            cout << "No chapters found. Please add a chapter first." << endl;
-            return;
-        }
-
-        char chapterName[100];
-        cout << "Enter chapter name: ";
-        cin.ignore();
-        cin.getline(chapterName, sizeof(chapterName));
-
-        Node* chapter = root;
-        while (chapter != nullptr && strcmp(chapter->name, chapterName) != 0) {
-            chapter = chapter->nextSibling;
-        }
-
-        if (chapter == nullptr) {
-            cout << "Chapter not found." << endl;
-            return;
-        }
-
-        char sectionName[100];
-        cout << "Enter section name: ";
-        cin.getline(sectionName, sizeof(sectionName));
-
-        Node* section = chapter->children;
-        while (section != nullptr && strcmp(section->name, sectionName) != 0) {
-            section = section->nextSibling;
-        }
-
-        if (section == nullptr) {
-            cout << "Section not found." << endl;
-            return;
-        }
-
-        char subsectionName[100];
-        cout << "Enter subsection name: ";
-        cin.getline(subsectionName, sizeof(subsectionName));
-
-        Node* subsection = new Node(subsectionName);
-        addNode(section, subsection);
-    }
-
-    void printTree() {
-        if (root == nullptr) {
-            cout << "No nodes found. Please add nodes first." << endl;
-            return;
-        }
-
-        printNodes(root, 0);
-    }
+    void create_Tree();
+    void display(node *r1);
 };
 
-int main() {
-    Tree book;
+void Tree ::create_Tree()
+{
+    int i, j, k;
+    root = new node;
+    cout << "Enter BOOK Name : ";
+    cin >> root->name;
+    cout << "Enter Number of Chapters : ";
+    cin >> root->count;
+    for (int i = 0; i < root->count; i++)
+    {
+        root->child[i] = new node;
+        cout << "Enter Chapter Name : ";
+        cin >> root->child[i]->name;
 
+        cout << "Enter No of Section : ";
+        cin >> root->child[i]->count;
+
+        for (int j = 0; j < root->child[i]->count; j++)
+        {
+            root->child[i]->child[j] = new node;
+            cout << "Enter Name of Section : ";
+            cin >> root->child[i]->child[j]->name;
+
+            cout << "Enter Number of Sub-Section : ";
+            cin >> root->child[i]->child[j]->count;
+
+            for (int k = 0; k < root->child[i]->child[j]->count; k++)
+            {
+                root->child[i]->child[j]->child[k] = new node;
+                cout << "Enter Name of Subsection : ";
+                cin >> root->child[i]->child[j]->child[k]->name;
+            }
+        }
+    }
+}
+
+void Tree::display(node *r1)
+{
+    int i, j, k;
+    if (r1 != NULL)
+    {
+        cout << "\n-----Book Hierarchy---";
+        cout << "\n Book title : " << r1->name;
+        for (i = 0; i < r1->count; i++)
+        {
+
+            cout << "\n Chapter " << i + 1;
+            cout << " " << r1->child[i]->name;
+            cout << "\n Sections : ";
+            for (j = 0; j < r1->child[i]->count; j++)
+            {
+                // cin>>r1->child[i]->child[j]->label;
+                cout << "\n " << r1->child[i]->child[j]->name;
+                cout << endl;
+                cout << " Sub-Section : ";
+                for(k=0; k < r1->child[i]->child[j]->count; k++)
+                {
+                    cout << "\n" << r1->child[i]->child[j]->child[k]->name;
+                    cout << endl;
+                }
+            }
+        }
+    }
+}
+
+
+int main()
+{
+    Tree bookTree;
     int choice;
-    while (true) {
-        cout << "Menu:" << endl;
-        cout << "1. Add Chapter" << endl;
-        cout << "2. Add Section" << endl;
-        cout << "3. Add Subsection" << endl;
-        cout << "4. Print Tree" << endl;
-        cout << "5. Exit" << endl;
 
+    while (true)
+    {
+        cout << "-----------------" << endl;
+        cout << "Book Tree Creation" << endl;
+        cout << "-----------------" << endl;
+        cout << "1. Create Tree" << endl;
+        cout << "2. Display Tree" << endl;
+        cout << "3. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
-        if (choice == 1) {
-            book.addChapter();
-        } else if (choice == 2) {
-            book.addSection();
-        } else if (choice == 3) {
-            book.addSubsection();
-        } else if (choice == 4) {
-            book.printTree();
-        } else if (choice == 5) {
-            break;
-        } else {
-            cout << "Invalid choice. Please try again." << endl;
+        switch (choice)
+        {
+            case 1:
+                bookTree.create_Tree();
+                break;
+            case 2:
+                bookTree.display(root);
+                break;
+            case 3:
+                exit(0);
+            default:
+                cout << "Invalid choice. Please try again." << endl;
         }
     }
 
