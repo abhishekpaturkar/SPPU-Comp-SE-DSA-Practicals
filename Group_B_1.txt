@@ -15,65 +15,63 @@ public:
     {
         root = NULL;
     }
-    void create_Tree();
-    void display(node *r1);
+    void createTree();
+    void displayTree(node *r1);
 };
 
-void Tree ::create_Tree()
+void Tree ::createTree()
 {
     int i, j, k;
     root = new node;
-    cout << "Enter BOOK Name : ";
+    cout << "Enter book name : ";
     cin >> root->name;
-    cout << "Enter Number of Chapters : ";
+    cout << "Enter number of chapters in the book: ";
     cin >> root->count;
-    for (int i = 0; i < root->count; i++)
+    for (i = 0; i < root->count; i++)
     {
         root->child[i] = new node;
-        cout << "Enter Chapter Name : ";
+        cout << "Enter chapter " << i + 1 << " name: ";
         cin >> root->child[i]->name;
 
-        cout << "Enter No of Section : ";
+        cout << "Enter number of sections in the chapter: ";
         cin >> root->child[i]->count;
 
-        for (int j = 0; j < root->child[i]->count; j++)
+        for (j = 0; j < root->child[i]->count; j++)
         {
             root->child[i]->child[j] = new node;
-            cout << "Enter Name of Section : ";
+            cout << "Enter section " << i + 1 << " name: ";
             cin >> root->child[i]->child[j]->name;
 
-            cout << "Enter Number of Sub-Section : ";
+            cout << "Enter number of sub-sections in the section: ";
             cin >> root->child[i]->child[j]->count;
 
-            for (int k = 0; k < root->child[i]->child[j]->count; k++)
+            for (k = 0; k < root->child[i]->child[j]->count; k++)
             {
                 root->child[i]->child[j]->child[k] = new node;
-                cout << "Enter Name of Subsection : ";
+                cout << "Enter sub-section " << i + 1 << " name: ";
                 cin >> root->child[i]->child[j]->child[k]->name;
             }
         }
     }
 }
 
-void Tree::display(node *r1)
+void Tree::displayTree(node *r1)
 {
     int i, j, k;
     if (r1 != NULL)
     {
-        cout << "\n-----Book Hierarchy---";
-        cout << "\n Book title : " << r1->name;
+        cout << "\n*** Book details ***";
+        cout << "\nBook title: " << r1->name << endl;
         for (i = 0; i < r1->count; i++)
         {
 
-            cout << "\n Chapter " << i + 1;
-            cout << " " << r1->child[i]->name;
-            cout << "\n Sections : ";
+            cout << "\nChapter " << i + 1 << ": " << r1->child[i]->name;
+            cout << "\n   Sections: ";
             for (j = 0; j < r1->child[i]->count; j++)
             {
-                // cin>>r1->child[i]->child[j]->label;
-                cout << "\n " << r1->child[i]->child[j]->name;
+                cout << "\n" << r1->child[i]->child[j]->name;
                 cout << endl;
-                cout << " Sub-Section : ";
+                cout << "      Sub-Section: ";
                 for(k=0; k < r1->child[i]->child[j]->count; k++)
                 {
                     cout << "\n" << r1->child[i]->child[j]->child[k]->name;
@@ -84,37 +82,33 @@ void Tree::display(node *r1)
     }
 }
 
-
 int main()
 {
     Tree bookTree;
     int choice;
 
-    while (true)
+    while(choice != 3)
     {
-        cout << "-----------------" << endl;
-        cout << "Book Tree Creation" << endl;
-        cout << "-----------------" << endl;
-        cout << "1. Create Tree" << endl;
-        cout << "2. Display Tree" << endl;
+        cout << "\n*** MENU ***" << endl;
+        cout << "1. Create book tree" << endl;
+        cout << "2. Display book tree" << endl;
         cout << "3. Exit" << endl;
-        cout << "Enter your choice: ";
+        cout << "\nEnter your choice: ";
         cin >> choice;
 
         switch (choice)
         {
-            case 1:
-                bookTree.create_Tree();
-                break;
-            case 2:
-                bookTree.display(root);
-                break;
-            case 3:
-                exit(0);
-            default:
-                cout << "Invalid choice. Please try again." << endl;
+        case 1:
+            bookTree.createTree();
+            break;
+        case 2:
+            bookTree.displayTree(root);
+            break;
+        case 3:
+            exit(0);
+        default:
+            cout << "Invalid choice. Please try again." << endl;
         }
     }
-
     return 0;
 }
