@@ -1,100 +1,100 @@
 /* There are flight paths between cities. If there is a flight between city A and city B then there is an edge between the cities. The cost of the edge can be the time that flight take to reach city B from A, or the amount of fuel used for the journey. Represent this as a graph. The node can be represented by airport name or name of the city. Use adjacency list representation of the graph or use adjacency matrix representation of the graph. Check whether the graph is connected or not. Justify the storage representation used */
 
 #include <iostream>
+#include <vector>
 #include <queue>
 
 using namespace std;
 
-int adj_mat[50][50] = {0,0};
+struct City {
+    string name;
+    vector<int> neighbors;
+};
+
+vector<City> adj_list;
+
 int visited[50] = {0};
 
-void dfs(int s, int n, string arr[])
-{
-	visited[s] = 1;
-	cout<<arr[s]<<" ";
-	for(int i=0; i<n; i++)
-	{
-		if(adj_mat[s][i] && !visited[i])
-        	dfs(i,n,arr);
-	}
-}
-
-void bfs(int s, int n, string arr[])
-{
-	bool visited[n];
-	for(int i=0; i<n; i++)
-        visited[i] = false;
-	int v;
-    queue<int> bfsq;
-    if(!visited[s])
-    {
-        cout<<arr[s]<<" ";
-    	bfsq.push(s);
-    	visited[s] = true;
-    	while(!bfsq.empty())
-    {
-    		v = bfsq.front();
-    		for(int i=0; i<n; i++)
-    		{
-    			if(adj_mat[v][i] && !visited[i])
-    		{
-    				cout<<arr[i]<<" ";
-    				visited[i] = true;
-    				bfsq.push(i);
-    			}
-    		}
-    		bfsq.pop();
-    	}
+void dfs(int s, string arr[]) {
+    visited[s] = 1;
+    cout << arr[s] << " ";
+    for (int neighbor : adj_list[s].neighbors) {
+        if (!visited[neighbor])
+            dfs(neighbor, arr);
     }
 }
 
-int main()
-{
-	cout<<"Enter no. of cities: ";
-	int n, u;
-	cin>>n;
-	string cities[n];
-	for(int i=0; i<n; i++)
-	{
-		cout<<"Enter city #"<<i+1<<" (Airport Code): ";
-		cin>>cities[i];
-	}
-	cout<<"\nYour cities are: "<<endl;
-	for(int i=0; i<n; i++)
-		cout<<"city #"<<i+1<<": "<<cities[i]<<endl;
-		
-	for(int i=0; i<n; i++)
-	{
-		for(int j=i+1; j<n; j++)
-	{
-
-		cout<<"Enter distance between "<<cities[i]<<" and "<<cities[j]<<": ";
-			cin>>adj_mat[i][j];
-			adj_mat[j][i] = adj_mat[i][j];
-		}
-	}
-	cout<<endl;
-	
-	for(int i=0; i<n; i++)
-	{
-	    cout << "\t";
-		cout<<cities[i]<<"\t";
-	}	
-  cout << endl;
-	for(int i=0; i<n; i++)
-	{
-		cout<<"\n"<<cities[i];
-		for(int j=0; j<n; j++)
-			cout<<"\t"<<adj_mat[i][j]<<"\t";
-		cout<<endl;
-	}
-	
-	cout<<"Enter Starting Vertex: ";
-	cin>>u;
-	cout<<"DFS: ";
-    dfs(u-1,n,cities);
-	cout<<endl;
-	cout<<"BFS: "; 
-	bfs(u-1,n,cities);
-	return 0;
+void bfs(int s, string arr[]) {
+    bool visited[50] = {false};
+    queue<int> bfsq;
+    bfsq.push(s);
+    visited[s] = true;
+    while (!bfsq.empty()) {
+        int v = bfsq.front();
+        bfsq.pop();
+        cout << arr[v] << " ";
+        for (int neighbor : adj_list[v].neighbors) {
+            if (!visited[neighbor]) {
+                bfsq.push(neighbor);
+                visited[neighbor] = true;
+            }
+        }
+    }
 }
+
+
+int main() {
+    cout << "Enter the number of cities: ";
+    int n, u;
+    cin >> n;
+
+    if (n <= 0 || n > 50) {
+        cout << "Invalid number of cities. Please try again." << endl;
+        return 0;
+    }
+
+    string cities[50];
+    for (int i = 0; i < n; i++) {
+        cout << "Enter city " << i + 1 << " (Airport name): ";
+        cin >> cities[i];
+    }
+    cout << "\nYour cities are: " << endl;
+    for (int i = 0; i < n; i++)
+        cout << "City " << i + 1 << ": " << cities[i] << endl;
+
+    adj_list.resize(n);
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            int dist;
+            cout << "Enter the distance between " << cities[i] << " and " << cities[j] << ": ";
+            cin >> dist;
+            if (dist > 0) {
+                adj_list[i].neighbors.push_back(j);
+                adj_list[j].neighbors.push_back(i);
+            }
+        }
+    }
+    cout << endl;
+
+    for (int i = 0; i < n; i++) {
+        cout << cities[i] << ": ";
+        for (int neighbor : adj_list[i].neighbors) {
+            cout << cities[neighbor] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "Enter the starting vertex: ";
+    cin >> u;
+    cout << "DFS: ";
+    dfs(u - 1, cities);
+    cout << endl;
+    cout << "BFS: ";
+    bfs(u - 1, cities);
+    cout << endl;
+
+
+    return 0;
+}
+
+
