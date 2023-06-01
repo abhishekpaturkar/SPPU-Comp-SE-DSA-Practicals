@@ -80,33 +80,5 @@ while True:
     else:
         print("Invalid choice. Please try again.")
         
-
-Program Explain
-
-Certainly! Let's go through each function in detail:
-
-1. `HashTable` class:
-   - `__init__(self, size)`: The constructor initializes the `size` of the hash table and creates a list called `table` with `size` number of elements, all initialized to `None`.
-
-   - `_hash_function(self, key)`: This private method calculates the hash value for a given `key` using the modulo operation (`%`) with the size of the hash table. It returns the hash value.
-
-   - `_get_next_index(self, index, i)`: This private method calculates the next index to probe in case of collisions using linear probing. It takes the current `index` and the probing `i` as parameters. It adds `i` to the current index and takes the modulo with the size of the hash table to ensure it stays within bounds. It returns the next index to probe.
-
-   - `insert(self, key, value)`: This method inserts a key-value pair into the hash table. It first calculates the initial index using the `_hash_function()` method. If the slot at that index in the `table` is empty (None), the key-value pair is stored there. Otherwise, linear probing is used to find the next available slot. The key-value pair is inserted at the first available slot.
-
-   - `search_by_name(self, name)`: This method searches for a given `name` in the hash table. It iterates through the `table` and compares the name with the second element of each non-empty slot (item). If a match is found, it returns the corresponding telephone number (first element of the item) along with the number of comparisons made during the search. If the name is not found, it returns `None` along with the number of comparisons.
-
-   - `show_list(self)`: This method displays the contents of the hash table. It iterates through the `table` and prints the name and telephone number for each non-empty slot (item).
-
-2. `insert_client()`: This function interacts with the user to input a telephone number and a name. It then calls the `insert()` method of the `HashTable` object (`telephone_book`) to insert the client into the hash table. Finally, it prints a message indicating that the client has been successfully inserted.
-
-3. `search_by_name()`: This function interacts with the user to input a name. It then calls the `search_by_name()` method of the `HashTable` object (`telephone_book`) to search for the client with that name in the hash table. If the client is found, it prints the corresponding telephone number and the number of comparisons made during the search. If the client is not found, it prints a message indicating that the client was not found.
-
-4. `show_list()`: This function calls the `show_list()` method of the `HashTable` object (`telephone_book`) to display the contents of the hash table.
-
-5. Main program: The main program prompts the user for the size of the hash table and creates a `HashTable` object (`telephone_book`). It then presents a menu to the user with options to insert a client, search by name, show the list, or exit the program. The chosen operation is executed accordingly.
-
-   - If the user chooses to insert a client, it calls the `insert_client()` function.
-   - If the user chooses to search by name, it calls the `search_by_name()` function.
    - If the user chooses to show the list, it calls the `show_list()` function.
    - If the user chooses to exit, the program breaks out of the loop and terminates.
