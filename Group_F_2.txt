@@ -1,0 +1,220 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+class Employee {
+private:
+    int employeeID;
+    char name[50];
+    char designation[50];
+    double salary;
+
+public:
+    void readData() {
+        cout << "Enter Employee ID: ";
+        cin >> employeeID;
+        cin.ignore();
+
+        cout << "Enter Name: ";
+        cin.getline(name, 50);
+
+        cout << "Enter Designation: ";
+        cin.getline(designation, 50);
+
+        cout << "Enter Salary: ";
+        cin >> salary;
+    }
+
+    void displayData() {
+        cout << "Employee ID: " << employeeID << endl;
+        cout << "Name: " << name << endl;
+        cout << "Designation: " << designation << endl;
+        cout << "Salary: " << salary << endl;
+    }
+
+    int getEmployeeID() {
+        return employeeID;
+    }
+
+    void writeToFile(fstream& file) {
+        file.write(reinterpret_cast<const char*>(this), sizeof(Employee));
+    }
+
+    void readFromFile(fstream& file) {
+        file.read(reinterpret_cast<char*>(this), sizeof(Employee));
+    }
+};
+
+class IndexRecord {
+private:
+    int key;
+    int offset;
+
+public:
+    IndexRecord() {}
+
+    IndexRecord(int key, int offset) : key(key), offset(offset) {}
+
+    int getKey() {
+        return key;
+    }
+
+    int getOffset() {
+        return offset;
+    }
+
+    void writeToFile(fstream& file) {
+        file.write(reinterpret_cast<const char*>(this), sizeof(IndexRecord));
+    }
+
+    void readFromFile(fstream& file) {
+        file.read(reinterpret_cast<char*>(this), sizeof(IndexRecord));
+    }
+};
+
+class IndexSequentialFile {
+private:
+    fstream dataFile;
+    fstream indexFile;
+
+public:
+    IndexSequentialFile() {
+        dataFile.open("employee_data.txt", ios::in | ios::out | ios::binary);
+        indexFile.open("index_data.txt", ios::in | ios::out | ios::binary);
+
+        if (!dataFile) {
+            dataFile.open("employee_data.txt", ios::out | ios::binary);
+            dataFile.close();
+            dataFile.open("employee_data.txt", ios::in | ios::out | ios::binary);
+        }
+
+        if (!indexFile) {
+            indexFile.open("index_data.txt", ios::out | ios::binary);
+            indexFile.close();
+            indexFile.open("index_data.txt", ios::in | ios::out | ios::binary);
+        }
+    }
+
+    ~IndexSequentialFile() {
+        dataFile.close();
+        indexFile.close();
+    }
+
+    void addEmployeeInfo() {
+        Employee employee;
+        employee.readData();
+
+        indexFile.seekp(0, ios::end);
+        int offset = dataFile.tellp();
+        IndexRecord indexRecord(employee.getEmployeeID(), offset);
+        indexRecord.writeToFile(indexFile);
+
+        dataFile.seekp(offset, ios::beg);
+        employee.writeToFile(dataFile);
+
+        cout << "Employee information added successfully!" << endl;
+    }
+
+    void deleteEmployeeInfo() {
+        int employeeID;
+        cout << "Enter Employee ID to delete: ";
+        cin >> employeeID;
+
+        IndexRecord indexRecord;
+        bool found = false;
+
+        indexFile.seekg(0, ios::beg);
+        while (indexRecord.readFromFile(indexFile)) {
+            if (indexRecord.getKey() == employeeID) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            dataFile.seekp(indexRecord.getOffset(), ios::beg);
+            Employee employee;
+            employee.readFromFile(dataFile);
+
+            // Mark the record as deleted by setting negative ID
+            employeeID = -employee.getEmployeeID();
+            employee.setEmployeeID(employeeID);
+
+            dataFile.seekp(indexRecord.getOffset(), ios::beg);
+            employee.writeToFile(dataFile);
+
+            cout << "Employee information deleted successfully!" << endl;
+        } else {
+            cout << "Employee information not found!" << endl;
+        }
+    }
+
+    void displayEmployeeInfo() {
+        int employeeID;
+        cout << "Enter Employee ID to display: ";
+        cin >> employeeID;
+
+        IndexRecord indexRecord;
+        bool found = false;
+
+        indexFile.seekg(0, ios::beg);
+        while (indexRecord.readFromFile(indexFile)) {
+            if (indexRecord.getKey() == employeeID) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            dataFile.seekg(indexRecord.getOffset(), ios::beg);
+            Employee employee;
+            employee.readFromFile(dataFile);
+            if (employee.getEmployeeID() > 0) {
+                employee.displayData();
+            } else {
+                cout << "Employee information not found!" << endl;
+            }
+        } else {
+            cout << "Employee information not found!" << endl;
+        }
+    }
+};
+
+int main() {
+    IndexSequentialFile file;
+    int choice;
+
+    while (true) {
+        cout << "Menu:" << endl;
+        cout << "1. Add Employee Information" << endl;
+        cout << "2. Delete Employee Information" << endl;
+        cout << "3. Display Employee Information" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                file.addEmployeeInfo();
+                break;
+            case 2:
+                file.deleteEmployeeInfo();
+                break;
+            case 3:
+                file.displayEmployeeInfo();
+                break;
+            case 4:
+                cout << "Exiting the program." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+                break;
+        }
+
+        cout << endl;
+    }
+
+    return 0;
+}
