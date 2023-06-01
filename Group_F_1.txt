@@ -1,0 +1,178 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+// Student class to represent student information
+class Student {
+private:
+    int rollNumber;
+    char name[50];
+    char division;
+    char address[100];
+
+public:
+    void readData() {
+        cout << "Enter Roll Number: ";
+        cin >> rollNumber;
+        cin.ignore();
+
+        cout << "Enter Name: ";
+        cin.getline(name, 50);
+
+        cout << "Enter Division: ";
+        cin >> division;
+        cin.ignore();
+
+        cout << "Enter Address: ";
+        cin.getline(address, 100);
+    }
+
+    void displayData() {
+        cout << "Roll Number: " << rollNumber << endl;
+        cout << "Name: " << name << endl;
+        cout << "Division: " << division << endl;
+        cout << "Address: " << address << endl;
+    }
+
+    int getRollNumber() {
+        return rollNumber;
+    }
+
+    // Function to write student data to a file
+    void writeToFile(fstream& file) {
+        file.write(reinterpret_cast<const char*>(this), sizeof(Student));
+    }
+
+    // Function to read student data from a file
+    void readFromFile(fstream& file) {
+        file.read(reinterpret_cast<char*>(this), sizeof(Student));
+    }
+};
+
+// Function to add student information to the file
+void addStudentInfo() {
+    fstream file("student_data.txt", ios::out | ios::app | ios::binary);
+    if (!file) {
+        cout << "Error in creating file!";
+        return;
+    }
+
+    Student student;
+    student.readData();
+
+    student.writeToFile(file);
+
+    file.close();
+    cout << "Student information added successfully!" << endl;
+}
+
+// Function to delete student information from the file
+void deleteStudentInfo() {
+    int rollNumber;
+    cout << "Enter Roll Number of the student to delete: ";
+    cin >> rollNumber;
+
+    fstream file("student_data.txt", ios::in | ios::binary);
+    if (!file) {
+        cout << "Error in opening file!";
+        return;
+    }
+
+    fstream tempFile("temp_data.txt", ios::out | ios::binary);
+    if (!tempFile) {
+        cout << "Error in creating temporary file!";
+        file.close();
+        return;
+    }
+
+    Student student;
+    bool found = false;
+
+    while (file.read(reinterpret_cast<char*>(&student), sizeof(Student))) {
+        if (student.getRollNumber() != rollNumber) {
+            student.writeToFile(tempFile);
+        } else {
+            found = true;
+        }
+    }
+
+    file.close();
+    tempFile.close();
+
+    if (found) {
+        remove("student_data.txt");
+        rename("temp_data.txt", "student_data.txt");
+        cout << "Student information deleted successfully!" << endl;
+    } else {
+        remove("temp_data.txt");
+        cout << "Student information not found!" << endl;
+    }
+}
+
+// Function to display student information based on roll number
+void displayStudentInfo() {
+    int rollNumber;
+    cout << "Enter Roll Number of the student to display: ";
+    cin >> rollNumber;
+
+    fstream file("student_data.txt", ios::in | ios::binary);
+    if (!file) {
+        cout << "Error in opening file!";
+        return;
+    }
+
+    Student student;
+    bool found = false;
+
+    while (file.read(reinterpret_cast<char*>(&student), sizeof(Student))) {
+        if (student.getRollNumber() == rollNumber) {
+            student.displayData();
+            found = true;
+            break;
+        }
+    }
+
+    file.close();
+
+    if (!found) {
+        cout << "Student information not found!" << endl;
+    }
+}
+
+int main() {
+    int choice;
+
+    while (true) {
+        cout << "Menu:" << endl;
+        cout << "1. Add Student Information" << endl;
+        cout << "2. Delete Student Information" << endl;
+        cout << "3. Display Student Information" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addStudentInfo();
+                break;
+            case 2:
+                deleteStudentInfo();
+                break;
+            case 3:
+                displayStudentInfo();
+                break;
+            case 4:
+                cout << "Exiting the program." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+                break;
+        }
+
+        cout << endl;
+    }
+
+    return 0;
+}
