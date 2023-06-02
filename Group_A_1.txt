@@ -80,5 +80,3 @@ while True:
     else:
         print("Invalid choice. Please try again.")
         
-   - If the user chooses to show the list, it calls the `show_list()` function.
-   - If the user chooses to exit, the program breaks out of the loop and terminates.
