@@ -54,7 +54,8 @@ public class HeapSort {
             largest = right;
         }
 
-        // If the largest element is not the root, swap them and heapify the affected sub-tree
+        // If the largest element is not the root, swap them and heapify the affected
+        // sub-tree
         if (largest != i) {
             int temp = arr[i];
             arr[i] = arr[largest];
@@ -75,6 +76,8 @@ class ArrayInput {
         for (int i = 0; i < n; i++) {
             arr[i] = scanner.nextInt();
         }
+
+        scanner.close();
 
         return arr;
     }
