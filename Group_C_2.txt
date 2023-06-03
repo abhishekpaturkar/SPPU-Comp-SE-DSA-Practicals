@@ -1,0 +1,130 @@
+#include <iostream>
+#include <list>
+#include <queue>
+#include <stack>
+
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    list<int>* adjacencyList;
+
+public:
+    Graph(int numVertices) {
+        this->numVertices = numVertices;
+        adjacencyList = new list<int>[numVertices];
+    }
+
+    void addEdge(int src, int dest) {
+        if (src >= 0 && src < numVertices && dest >= 0 && dest < numVertices) {
+            adjacencyList[src].push_back(dest);
+            // For an undirected graph, add the following line:
+            // adjacencyList[dest].push_back(src);
+        }
+    }
+
+    void performDFS(int startVertex) {
+        bool* visited = new bool[numVertices];
+        for (int i = 0; i < numVertices; i++)
+            visited[i] = false;
+
+        stack<int> stack;
+        stack.push(startVertex);
+
+        cout << "DFS traversal: ";
+        while (!stack.empty()) {
+            int vertex = stack.top();
+            stack.pop();
+
+            if (!visited[vertex]) {
+                cout << vertex << " ";
+                visited[vertex] = true;
+
+                for (int adjacentVertex : adjacencyList[vertex]) {
+                    if (!visited[adjacentVertex])
+                        stack.push(adjacentVertex);
+                }
+            }
+        }
+
+        delete[] visited;
+    }
+
+    void performBFS(int startVertex) {
+        bool* visited = new bool[numVertices];
+        for (int i = 0; i < numVertices; i++)
+            visited[i] = false;
+
+        queue<int> queue;
+        queue.push(startVertex);
+
+        cout << "BFS traversal: ";
+        while (!queue.empty()) {
+            int vertex = queue.front();
+            queue.pop();
+
+            if (!visited[vertex]) {
+                cout << vertex << " ";
+                visited[vertex] = true;
+
+                for (int adjacentVertex : adjacencyList[vertex]) {
+                    if (!visited[adjacentVertex])
+                        queue.push(adjacentVertex);
+                }
+            }
+        }
+
+        delete[] visited;
+    }
+};
+
+int main() {
+    int numVertices;
+    cout << "Enter the number of vertices in the graph: ";
+    cin >> numVertices;
+
+    Graph graph(numVertices);
+
+    int choice;
+    do {
+        cout << "\n----- Menu -----\n";
+        cout << "1. Add an edge\n";
+        cout << "2. Perform DFS\n";
+        cout << "3. Perform BFS\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                int src, dest;
+                cout << "Enter source and destination vertices: ";
+                cin >> src >> dest;
+                graph.addEdge(src, dest);
+                break;
+            }
+            case 2: {
+                int startVertex;
+                cout << "Enter the start vertex for DFS: ";
+                cin >> startVertex;
+                graph.performDFS(startVertex);
+                break;
+            }
+            case 3: {
+                int startVertex;
+                cout << "Enter the start vertex for BFS: ";
+                cin >> startVertex;
+                graph.performBFS(startVertex);
+                break;
+            }
+            case 4:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice! Please try again.\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
