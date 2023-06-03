@@ -1,39 +1,49 @@
 #include <iostream>
 #include <stack>
+#include <cctype>
 
 using namespace std;
 
-struct Node {
+struct Node
+{
     char data;
     Node* left;
     Node* right;
 
-    Node(char value) {
+    Node(char value)
+    {
         data = value;
         left = nullptr;
         right = nullptr;
     }
 };
 
-class Tree {
+class ExpressionTree
+{
 private:
     Node* root;
 
 public:
-    Tree() {
+    ExpressionTree()
+    {
         root = nullptr;
     }
 
-    void constructTree(string expression) {
+    void constructTree(const string& expression)
+    {
         stack<Node*> nodeStack;
 
-        for (int i = expression.length() - 1; i >= 0; i--) {
+        for (int i = expression.length() - 1; i >= 0; i--)
+        {
             char c = expression[i];
 
-            if (isOperand(c)) {
+            if (isOperand(c))
+            {
                 Node* newNode = new Node(c);
                 nodeStack.push(newNode);
-            } else {
+            }
+            else if (isOperator(c))
+            {
                 Node* newNode = new Node(c);
                 newNode->left = nodeStack.top();
                 nodeStack.pop();
@@ -47,8 +57,10 @@ public:
         root = nodeStack.top();
     }
 
-    void postorderTraversal() {
-        if (root == nullptr) {
+    void postorderTraversal() const
+    {
+        if (root == nullptr)
+        {
             cout << "Tree is empty." << endl;
             return;
         }
@@ -57,16 +69,23 @@ public:
         Node* current = root;
         Node* lastVisited = nullptr;
 
-        while (!nodeStack.empty() || current != nullptr) {
-            if (current != nullptr) {
+        while (!nodeStack.empty() || current != nullptr)
+        {
+            if (current != nullptr)
+            {
                 nodeStack.push(current);
                 current = current->left;
-            } else {
+            }
+            else
+            {
                 Node* topNode = nodeStack.top();
 
-                if (topNode->right != nullptr && topNode->right != lastVisited) {
+                if (topNode->right != nullptr && topNode->right != lastVisited)
+                {
                     current = topNode->right;
-                } else {
+                }
+                else
+                {
                     cout << topNode->data << " ";
                     lastVisited = topNode;
                     nodeStack.pop();
@@ -77,8 +96,10 @@ public:
         cout << endl;
     }
 
-    void deleteTree(Node* node) {
-        if (node == nullptr) {
+    void deleteTree(Node* node)
+    {
+        if (node == nullptr)
+        {
             return;
         }
 
@@ -87,49 +108,65 @@ public:
         delete node;
     }
 
-    void deleteTree() {
+    void deleteTree()
+    {
         deleteTree(root);
         root = nullptr;
         cout << "Tree deleted." << endl;
     }
 
-    bool isOperand(char c) {
+    bool isOperand(char c) const
+    {
         return isalpha(c);
+    }
+
+    bool isOperator(char c) const
+    {
+        return (c == '+' || c == '-' || c == '*' || c == '/');
     }
 };
 
-int main() {
-    Tree expressionTree;
-
-    string prefixExpression;
-    cout << "Enter the prefix expression: ";
-    getline(cin, prefixExpression);
-
-    expressionTree.constructTree(prefixExpression);
+int main()
+{
+    ExpressionTree expressionTree;
 
     int choice;
-    while (true) {
+    while (true)
+    {
         cout << "Menu:" << endl;
-        cout << "1. Perform Postorder Traversal" << endl;
-        cout << "2. Delete Tree" << endl;
-        cout << "3. Exit" << endl;
+        cout << "1. Enter prefix expression and construct the tree" << endl;
+        cout << "2. Perform Postorder Traversal" << endl;
+        cout << "3. Delete Tree" << endl;
+        cout << "4. Exit" << endl;
 
         cout << "Enter your choice: ";
         cin >> choice;
+        cin.ignore();
 
-        switch (choice) {
-            case 1:
-                cout << "Postorder Traversal: ";
-                expressionTree.postorderTraversal();
-                break;
-            case 2:
-                expressionTree.deleteTree();
-                break;
-            case 3:
-                cout << "Exiting the program." << endl;
-                return 0;
-            default:
-                cout << "Invalid choice. Please try again." << endl;
+        switch (choice)
+        {
+        case 1:
+        {
+            string prefixExpression;
+            cout << "Enter the prefix expression: ";
+            getline(cin, prefixExpression);
+
+            expressionTree.constructTree(prefixExpression);
+            cout << "Expression tree constructed." << endl;
+            break;
+        }
+        case 2:
+            cout << "Postorder Traversal: ";
+            expressionTree.postorderTraversal();
+            break;
+        case 3:
+            expressionTree.deleteTree();
+            break;
+        case 4:
+            cout << "Exiting the program." << endl;
+            return 0;
+        default:
+            cout << "Invalid choice. Please try again." << endl;
         }
 
         cout << endl;
