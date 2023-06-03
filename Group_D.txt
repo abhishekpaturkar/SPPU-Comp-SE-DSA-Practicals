@@ -1,0 +1,145 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+
+using namespace std;
+
+class OBST {
+private:
+    vector<int> keys;
+    vector<double> probabilities;
+    vector<vector<double>> cost;
+    vector<vector<int>> root;
+
+public:
+    OBST() {}
+
+    void takeUserInput() {
+        int numKeys;
+        cout << "Enter the number of keys: ";
+        cin >> numKeys;
+
+        cout << "Enter the keys in sorted order:" << endl;
+        for (int i = 0; i < numKeys; i++) {
+            int key;
+            cin >> key;
+            keys.push_back(key);
+        }
+
+        cout << "Enter the access probabilities for each key:" << endl;
+        for (int i = 0; i < numKeys; i++) {
+            double probability;
+            cin >> probability;
+            probabilities.push_back(probability);
+        }
+    }
+
+    void computeOBST() {
+        int n = keys.size();
+
+        // Initialize the cost and root matrices
+        cost.resize(n + 1, vector<double>(n + 1));
+        root.resize(n, vector<int>(n));
+
+        // Compute the cost and root matrices
+        for (int i = 1; i <= n; i++) {
+            cost[i][i] = probabilities[i - 1];
+            root[i - 1][i - 1] = i;
+        }
+
+        for (int len = 2; len <= n; len++) {
+            for (int i = 1; i <= n - len + 1; i++) {
+                int j = i + len - 1;
+                cost[i][j] = numeric_limits<double>::infinity();
+
+                double sumProbabilities = getSumProbabilities(i, j);
+
+                for (int r = i; r <= j; r++) {
+                    double currentCost = cost[i][r - 1] + cost[r + 1][j] + sumProbabilities;
+
+                    if (currentCost < cost[i][j]) {
+                        cost[i][j] = currentCost;
+                        root[i - 1][j - 1] = r;
+                    }
+                }
+            }
+        }
+    }
+
+    double getSumProbabilities(int start, int end) {
+        double sum = 0.0;
+        for (int i = start; i <= end; i++) {
+            sum += probabilities[i - 1];
+        }
+        return sum;
+    }
+
+    void printOBST() {
+        int n = keys.size();
+        cout << "Optimal Binary Search Tree:" << endl;
+        printOBSTUtil(1, n, 0);
+    }
+
+private:
+    void printOBSTUtil(int start, int end, int parent) {
+        if (start > end) {
+            cout << "d" << parent << " is the left child of k" << parent - 1 << endl;
+            return;
+        }
+
+        int rootIndex = root[start - 1][end - 1];
+        int rootKey = keys[rootIndex - 1];
+
+        if (parent == 0) {
+            cout << "k" << rootKey << " is the root" << endl;
+        } else {
+            cout << "k" << rootKey << " is the left child of k" << parent - 1 << endl;
+        }
+
+        printOBSTUtil(start, rootIndex - 1, rootKey);
+        printOBSTUtil(rootIndex + 1, end, rootKey);
+    }
+};
+
+int main() {
+    OBST obst;
+
+    while (true) {
+        cout << "Menu:" << endl;
+        cout << "1. Enter keys and access probabilities" << endl;
+        cout << "2. Compute Optimal Binary Search Tree" << endl;
+        cout << "3. Print Optimal Binary Search Tree" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Enter your choice: ";
+
+        int choice;
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                obst.takeUserInput();
+                break;
+            }
+            case 2: {
+                obst.computeOBST();
+                cout << "Optimal Binary Search Tree computed." << endl;
+                break;
+            }
+            case 3: {
+                obst.printOBST();
+                break;
+            }
+            case 4: {
+                cout << "Exiting the program." << endl;
+                return 0;
+            }
+            default: {
+                cout << "Invalid choice. Please try again." << endl;
+                break;
+            }
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
