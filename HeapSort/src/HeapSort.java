@@ -8,12 +8,7 @@ public class HeapSort {
         System.out.print("Enter the number of elements: ");
         int n = scanner.nextInt();
 
-        int[] arr = new int[n];
-        System.out.println("Enter the elements:");
-
-        for (int i = 0; i < n; i++) {
-            arr[i] = scanner.nextInt();
-        }
+        int[] arr = ArrayInput.getUserArray(n);
 
         System.out.println("Before sorting:");
         System.out.println(Arrays.toString(arr));
@@ -67,5 +62,20 @@ public class HeapSort {
 
             heapify(arr, n, largest);
         }
+    }
+}
+
+class ArrayInput {
+    public static int[] getUserArray(int n) {
+        Scanner scanner = new Scanner(System.in);
+
+        int[] arr = new int[n];
+        System.out.println("Enter the elements:");
+
+        for (int i = 0; i < n; i++) {
+            arr[i] = scanner.nextInt();
+        }
+
+        return arr;
     }
 }
