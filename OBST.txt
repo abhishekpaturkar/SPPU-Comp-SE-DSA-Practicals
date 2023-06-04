@@ -1,0 +1,117 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+struct Node {
+    int key;
+    int search_cost;
+    Node* left;
+    Node* right;
+
+    Node(int k) : key(k), search_cost(0), left(nullptr), right(nullptr) {}
+};
+
+// Function to build the binary search tree with least search cost
+Node* buildOptimalBST(vector<int>& keys, vector<double>& probabilities, int start, int end, double& min_cost) {
+    if (start > end) {
+        return nullptr;
+    }
+
+    // Find the index of the key with minimum probability
+    int min_prob_index = start;
+    for (int i = start + 1; i <= end; ++i) {
+        if (probabilities[i] < probabilities[min_prob_index]) {
+            min_prob_index = i;
+        }
+    }
+
+    // Create a new node with the key
+    Node* newNode = new Node(keys[min_prob_index]);
+    newNode->search_cost = probabilities[min_prob_index];
+
+    // Recursively build left and right subtrees
+    newNode->left = buildOptimalBST(keys, probabilities, start, min_prob_index - 1, min_cost);
+    newNode->right = buildOptimalBST(keys, probabilities, min_prob_index + 1, end, min_cost);
+
+    // Calculate the minimum search cost for the current subtree
+    double left_cost = newNode->left ? newNode->left->search_cost : 0;
+    double right_cost = newNode->right ? newNode->right->search_cost : 0;
+    newNode->search_cost += left_cost + right_cost;
+
+    // Update the minimum search cost
+    if (newNode->search_cost < min_cost) {
+        min_cost = newNode->search_cost;
+    }
+
+    return newNode;
+}
+
+// Function to print the binary search tree (inorder traversal)
+void inorderTraversal(Node* root) {
+    if (root) {
+        inorderTraversal(root->left);
+        cout << "Key: " << root->key << ", Search Cost: " << root->search_cost << endl;
+        inorderTraversal(root->right);
+    }
+}
+
+int main() {
+    vector<int> keys;
+    vector<double> probabilities;
+
+    int choice;
+    int key;
+    double probability;
+
+    cout << "Binary Search Tree Builder\n";
+
+    do {
+        cout << "\nMenu:\n";
+        cout << "1. Add key\n";
+        cout << "2. Build optimal BST\n";
+        cout << "3. Print BST (Inorder Traversal)\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter key: ";
+                cin >> key;
+                keys.push_back(key);
+                cout << "Enter probability: ";
+                cin >> probability;
+                probabilities.push_back(probability);
+                break;
+            case 2:
+                if (keys.empty()) {
+                    cout << "No keys added yet.\n";
+                } else {
+                    int n = keys.size();
+                    double min_cost = numeric_limits<double>::max();
+                    Node* root = buildOptimalBST(keys, probabilities, 0, n - 1, min_cost);
+                    cout << "Optimal Binary Search Tree (Inorder Traversal):\n";
+                    inorderTraversal(root);
+                }
+                break;
+            case 3:
+                if (keys.empty()) {
+                    cout << "No keys added yet.\n";
+                } else {
+                    cout << "Binary Search Tree (Inorder Traversal):\n";
+                    for (int i = 0; i < keys.size(); ++i) {
+                        cout << "Key: " << keys[i] << ", Probability: " << probabilities[i] << endl;
+                    }
+                }
+                break;
+            case 4:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
